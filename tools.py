@@ -31,17 +31,20 @@ class YOLO:
         return classes
 
     def get_train_file(self):
-        with open(self.classes_txt, 'r') as f:
+        with open(self.train_txt, 'r') as f:
             train = f.readlines()
-        train = [i.strip('\n') for i in train]
+        train = [i.strip('\n') for i in train]  # e.g.00001,00002,00003
         return train
 
     def check_image(self):
         classes = self.get_classes()
         images = os.listdir(self.images)
-        for image in images:
-            image_path = os.path.join(self.images, image)
-            label_path = os.path.join(self.labels, image.replace('jpg', 'txt'))
+        train = self.get_train_file()
+
+        for image in train:
+
+            image_path = os.path.join(self.images, image + '.jpg')
+            label_path = os.path.join(self.labels, image + '.jpg.txt')
             logger.info(f'image: {image_path}')
             logger.info(f'label: {label_path}')
             im = cv2.imread(image_path)
@@ -267,11 +270,12 @@ class VOC:
 
 
 if __name__ == '__main__':
-    dataset_root = '/home/ubuntu/data/VOC_Fire_Smoke/VOC2020'
-    classes = ['fire']
-   
-    voc = VOC(dataset_root, classes)
-    yolo = YOLO(dataset_root)
+    yolo_dataset_root = '/home/ubuntu/data/VOCdevkit/VOC2007/WiderPerson/yolo'
+    voc_dataset_root = '/home/ubuntu/data/VOCdevkit/VOC2007/WiderPerson'
+    classes = ['pedestrians,riders,partially_persons,ignore regions,crowd']
 
-    # voc.voc2yolo()
-    yolo.check_image()
+    voc = VOC(voc_dataset_root, classes)
+    # yolo = YOLO(yolo_dataset_root)
+
+    voc.voc2yolo()
+    # yolo.check_image()
